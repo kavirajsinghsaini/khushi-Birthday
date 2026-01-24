@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Apology Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;500&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0f0206;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- SCENE MANAGEMENT --- */
+        .scene {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease-in-out;
+            padding: 20px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .scene.active { opacity: 1; pointer-events: auto; z-index: 10; }
+
+        .particles {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+            background: radial-gradient(circle at center, #2a0a10 0%, #000000 100%);
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: #ff4d6d;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255, 77, 109, 0.5);
+            flex-shrink: 0;
+        }
+
+        .shayari {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            line-height: 1.8;
+            max-width: 600px;
+            margin-bottom: 30px;
+            color: #ffccd5;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid #ff4d6d;
+            color: #ff4d6d;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.4s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+        .btn:hover { background: #ff4d6d; color: white; box-shadow: 0 0 15px #ff4d6d; }
+
+        /* --- SCENE 3: PROPER LARGE GALLERY --- */
+        .gallery-scroll-area {
+            width: 100%;
+            max-width: 1000px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: #ff4d6d #2a0a10;
+        }
+        .gallery-scroll-area::-webkit-scrollbar { width: 8px; }
+        .gallery-scroll-area::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .gallery-scroll-area::-webkit-scrollbar-thumb { background-color: #ff4d6d; border-radius: 10px; }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+        .gallery-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+        }
+        .gallery-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.3);
+            border-color: #ff4d6d;
+        }
+        .gallery-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+        }
+        .card-caption { margin-top: 10px; font-size: 0.85rem; color: #ffccd5; font-family: 'Playfair Display', serif; }
+        
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+        /* --- SCENE 4: INFINITY CAROUSEL --- */
+        .carousel-wrapper {
+            width: 100%;
+            max-width: 900px;
+            overflow: hidden;
+            position: relative;
+            padding: 20px 0;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            margin-bottom: 30px;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 15px;
+            width: max-content;
+            animation: scrollLeft 25s linear infinite;
+        }
+
+        /* Pause on hover */
+        .carousel-wrapper:hover .carousel-track {
+            animation-play-state: paused;
+        }
+
+        .carousel-item {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
+            position: relative;
+            background: #1a0509;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Overlay text on carousel items */
+        .carousel-overlay {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 0.7rem;
+            padding: 5px;
+            text-align: center;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        .carousel-item:hover .carousel-overlay {
+            transform: translateY(0);
+        }
+
+        @keyframes scrollLeft {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- SCENE 5: CLOCK (SIZE UPDATED) --- */
+        .clock-container {
+            position: relative;
+            width: 450px; /* SIZE INCREASED */
+            height: 450px; /* SIZE INCREASED */
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 30px;
+            animation: rotateClock 40s linear infinite;
+        }
+        .center-heart {
+            width: 100px; /* SIZE INCREASED */
+            height: 100px; /* SIZE INCREASED */
+            background: #ff4d6d; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2rem; /* SIZE INCREASED */
+            box-shadow: 0 0 50px #ff4d6d; z-index: 20;
+            animation: heartbeat 1s infinite;
+        }
+        .clock-arm { position: absolute; top: 50%; left: 50%; width: 0; height: 0; }
+        .clock-arm img {
+            position: absolute;
+            width: 70px; /* SIZE INCREASED */
+            height: 70px; /* SIZE INCREASED */
+            border-radius: 50%;
+            border: 2px solid white;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes rotateClock { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+        /* --- SCENE 6: FINAL --- */
+        .final-btn {
+            padding: 20px 60px; font-size: 2rem;
+            background: linear-gradient(45deg, #ff4d6d, #ff9a9e);
+            border: none; color: white; border-radius: 50px;
+            font-family: 'Great Vibes', cursive; cursor: pointer;
+            box-shadow: 0 10px 40px rgba(255, 77, 109, 0.6);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 77, 109, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-card img { height: 150px; }
+            
+            /* Carousel Mobile */
+            .carousel-item { width: 120px; height: 120px; }
+            
+            /* Clock Mobile Adjustments */
+            .clock-container { width: 320px; height: 320px; } /* SIZE INCREASED */
+            .clock-arm img { width: 55px; height: 55px; } /* SIZE INCREASED */
+            .center-heart { width: 90px; height: 90px; font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="particles" id="particles"></div>
+
+    <!-- SCENE 1: INTRO -->
+    <div class="scene active" id="scene1">
+        <h1>Hey You...</h1>
+        <p style="color:#ccc; margin-bottom:20px;">Mujhe tumse kuch baat kehne do.</p>
+        <button class="btn" onclick="nextScene(2)">Read This</button>
+    </div>
+
+    <!-- SCENE 2: SHAYARI -->
+    <div class="scene" id="scene2">
+        <h1>Meri Jaan</h1>
+        <div class="shayari">
+            "Tumhari khubsurti dekh kar,<br>
+            main khud ko bhool jata hoon.<br>
+            Par aaj maine tumhe dil todkar,<br>
+            apni asli reality dikha di."
+        </div>
+        <button class="btn" onclick="nextScene(3)">See Our Memories</button>
+    </div>
+
+    <!-- SCENE 3: PROPER LARGE GALLERY -->
+    <div class="scene" id="scene3">
+        <h1>Our Beautiful Memories</h1>
+        
+        <div class="gallery-scroll-area">
+            <div class="gallery-grid">
+                <div class="gallery-card">
+                    <img src="images/1.jpg" alt="Memory">
+                    <div class="card-caption">That smile...</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="images/2.jpg" alt="Memory">
+                    <div class="card-caption">Us together</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="images/3.jpg" alt="Memory">
+                    <div class="card-caption">Best day</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="images/4.jpg" alt="Memory">
+                    <div class="card-caption">Miss this</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="images/5.jpg" alt="Memory">
+                    <div class="card-caption">Beautiful eyes</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="images/6.jpg" alt="Memory">
+                    <div class="card-caption">Pure joy</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="images/7.jpg" alt="Memory">
+                    <div class="card-caption">My world</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="images/8.jpg" alt="Memory">
+                    <div class="card-caption">Forever</div>
+                </div>
+                <div class="gallery-card">
+                    <img src="images/9.jpg" alt="Memory">
+                    <div class="card-caption">Please come back</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="nextScene(4)">And Now...</button>
+    </div>
+
+    <!-- SCENE 4: INFINITY CAROUSEL -->
+    <div class="scene" id="scene4">
+        <h1>I'm So Sorry</h1>
+        
+        <div class="carousel-wrapper">
+            <div class="carousel-track" id="carouselTrack">
+                <!-- GIFs injected via JS -->
+            </div>
+        </div>
+        
+        <p style="color:#aaa; font-size:0.9rem; max-width:500px; margin-bottom:10px;">
+            Ye sab meri feelings hain. Mujhe pata hai maine galti ki.
+        </p>
+        <button class="btn" onclick="nextScene(5)">Time To Fix</button>
+    </div>
+
+    <!-- SCENE 5: CLOCK -->
+    <div class="scene" id="scene5">
+        <h1>Meri Duniya</h1>
+        <div class="clock-container" id="clock">
+            <div class="center-heart">Us</div>
+            <!-- Clock arms via JS -->
+        </div>
+        <p>Meri zindagi tere aas-paas ghumti hai.</p>
+        <button class="btn" onclick="nextScene(6)">Please</button>
+    </div>
+
+    <!-- SCENE 6: FINAL -->
+    <div class="scene" id="scene6">
+        <h1>Ek Aakhri Mauka</h1>
+        <p style="margin-bottom:20px;">Main wada karta hoon ab aisa nahi hoga.</p>
+        <button class="final-btn" onclick="forgive()">I Forgive You ❤️</button>
+    </div>
+
+    <script>
+        const gifs = [
+            "https://media.tenor.com/FitT9GUOgwAAAAAm/tkthao219-bubududu.webp",
+            "https://media.tenor.com/sCeOHLbcBcUAAAAm/love.webp",
+            "https://media.tenor.com/_WmoyydmaoQAAAAm/sorrynah.webp",
+            "https://media.tenor.com/MXhgLF7-FwAAAAAM/sorry.gif",
+            "https://media.tenor.com/av_ZXW5aSI4AAAAM/sorry.gif",
+            "https://media.tenor.com/wn_XGzVmx7cAAAAm/lon.webp",
+            "https://media.tenor.com/EgI1X4MQftEAAAAm/forgive-me-bubu-bubu-angry.webp",
+            "https://media.tenor.com/GAnWQh5LnF0AAAAM/love.gif"
+        ];
+
+        // --- SETUP INFINITY CAROUSEL (SCENE 4) ---
+        const track = document.getElementById('carouselTrack');
+        
+        // Create items. We duplicate the array 3 times to ensure smooth infinite scrolling on all screens
+        const infiniteGifs = [...gifs, ...gifs, ...gifs, ...gifs];
+        
+        infiniteGifs.forEach(url => {
+            const item = document.createElement('div');
+            item.className = 'carousel-item';
+            
+            const img = document.createElement('img');
+            img.src = url;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'carousel-overlay';
+            overlay.innerText = "Sorry ❤️";
+            
+            item.appendChild(img);
+            item.appendChild(overlay);
+            track.appendChild(item);
+        });
+
+        // --- SETUP CLOCK (SCENE 5) --- 
+        const clock = document.getElementById('clock');
+        const radius = 170; // RADIUS INCREASED TO 170
+        gifs.forEach((url, index) => {
+            const arm = document.createElement('div');
+            arm.className = 'clock-arm';
+            const angle = index * (360 / gifs.length);
+            arm.style.transform = `rotate(${angle}deg) translate(${radius}px)`;
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.transform = `rotate(-${angle}deg)`;
+            arm.appendChild(img);
+            clock.appendChild(arm);
+        });
+
+        function nextScene(id) {
+            document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+            document.getElementById(`scene${id}`).classList.add('active');
+        }
+
+        // PARTICLES
+        function createParticle() {
+            const p = document.createElement('div');
+            p.style.position = 'absolute';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = Math.random() * 100 + 'vh';
+            p.style.width = Math.random() * 3 + 'px';
+            p.style.height = p.style.width;
+            p.style.background = 'rgba(255, 77, 109, 0.5)';
+            p.style.borderRadius = '50%';
+            p.style.pointerEvents = 'none';
+            document.getElementById('particles').appendChild(p);
+            const anim = p.animate([
+                { transform: 'translateY(0)', opacity: 0 },
+                { transform: 'translateY(-100px)', opacity: 1 },
+                { transform: 'translateY(-300px)', opacity: 0 }
+            ], { duration: 3000 + Math.random() * 2000, iterations: Infinity });
+        }
+        for(let i=0; i<50; i++) createParticle();
+
+        function forgive() {
+            const btn = document.querySelector('.final-btn');
+            btn.innerHTML = "Love You! ❤️";
+            btn.style.background = "#fff"; btn.style.color = "#ff4d6d";
+            
+            for(let i=0; i<100; i++) {
+                const h = document.createElement('div');
+                h.innerText = '❤️'; h.style.position = 'fixed';
+                h.style.left = '50%'; h.style.top = '50%';
+                h.style.fontSize = (Math.random()*20+20) + 'px';
+                h.style.zIndex = '999'; document.body.appendChild(h);
+                const angle = Math.random() * Math.PI * 2;
+                const vel = Math.random() * 500 + 200;
+                const anim = h.animate([
+                    { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${Math.cos(angle)*vel}px), calc(-50% + ${Math.sin(angle)*vel}px)) scale(1)`, opacity: 0 }
+                ], { duration: 1500, easing: 'cubic-bezier(0, .9, .57, 1)' });
+                anim.onfinish = () => h.remove();
+            }
+            
+            document.body.style.transition = "background 2s";
+            document.body.style.background = "#fff";
+            document.querySelectorAll('h1, p').forEach(el => el.style.color = "#333");
+            document.getElementById('particles').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
